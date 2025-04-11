@@ -1,7 +1,7 @@
 # Hackathon Frontend Template
 
 A lightweight React frontend template designed for rapid development in hackathons. Built with React, Tailwind CSS, and minimal dependencies.
-
+test
 ## Features
 
 - 🔐 Authentication with JWT
