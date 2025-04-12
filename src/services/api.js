@@ -9,6 +9,24 @@ const MOCK_USER = {
   password: 'hackathon2025'
 };
 
+// Mock tasks data
+let mockTasks = [
+  {
+    id: 1,
+    title: 'Sample Task 1',
+    description: 'This is a sample task description',
+    status: 'Sent',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 2,
+    title: 'Sample Task 2',
+    description: 'Another sample task description',
+    status: 'Sent',
+    created_at: new Date().toISOString()
+  }
+];
+
 // Mock functions
 const mockLogin = async (credentials) => {
   await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
@@ -28,6 +46,18 @@ const mockLogin = async (credentials) => {
   throw new Error('Invalid credentials');
 };
 
+const mockGetTasks = async () => {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+  return { data: mockTasks };
+};
+
+const mockGetTask = async (id) => {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+  const task = mockTasks.find(t => t.id === parseInt(id));
+  if (!task) throw new Error('Task not found');
+  return { data: task };
+};
+
 const mockPostTask = async (payload) => {
   await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
   
@@ -39,6 +69,7 @@ const mockPostTask = async (payload) => {
     created_at: new Date().toISOString()
   };
   
+  mockTasks.push(newTask);
   return {
     data: newTask
   };
@@ -46,7 +77,28 @@ const mockPostTask = async (payload) => {
 
 const mockDeleteTask = async (taskId) => {
   await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+  mockTasks = mockTasks.filter(task => task.id !== parseInt(taskId));
   return { data: { id: taskId } };
+};
+
+const mockUpdateTask = async (taskId, payload) => {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+  
+  const updatedTask = {
+    id: parseInt(taskId),
+    title: payload.title,
+    description: payload.description,
+    status: 'Updated',
+    created_at: new Date().toISOString()
+  };
+  
+  mockTasks = mockTasks.map(task => 
+    task.id === parseInt(taskId) ? updatedTask : task
+  );
+  
+  return {
+    data: updatedTask
+  };
 };
 
 const api = axios.create({
@@ -80,10 +132,10 @@ export const authAPI = {
 };
 
 export const tasksAPI = {
-  getTasks: () => api.get('/tasks/'),
-  getTask: (id) => api.get(`/tasks/${id}/`),
+  getTasks: mockGetTasks, // Using mock task fetching instead of real API
+  getTask: mockGetTask, // Using mock task fetching instead of real API
   createTask: mockPostTask, // Using mock task creation instead of real API
-  updateTask: (id, data) => api.put(`/tasks/${id}/`, data),
+  updateTask: mockUpdateTask, // Using mock task update instead of real API
   deleteTask: mockDeleteTask, // Using mock task deletion instead of real API
 };
 

@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Tasks from './pages/Tasks';
+import EditTask from './pages/EditTask';
+import RegisterProject from './pages/RegisterProject';
 import ProtectedRoute from './components/ProtectedRoute';
 import useAuthStore from './store/authStore';
 
@@ -22,6 +24,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Tasks />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditTask />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/new"
+          element={
+            <ProtectedRoute>
+              <RegisterProject />
             </ProtectedRoute>
           }
         />
