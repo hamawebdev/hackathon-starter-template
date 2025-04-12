@@ -1,31 +1,35 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '../services/api';
-import useAuthStore from '../store/authStore';
+import { tasksAPI } from '../services/api';
 
-export default function Login() {
+export default function RegisterProject() {
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const formData = new FormData(e.target);
-    const credentials = {
-      email: formData.get('email'),
-      password: formData.get('password'),
-    };
-
     try {
-      const response = await authAPI.login(credentials);
-      setAuth(response.data.token, response.data.user);
+      await tasksAPI.createTask(formData);
+      setFormData({ title: '', description: '' }); // Clear form on success
       navigate('/tasks');
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Failed to submit project');
     } finally {
       setLoading(false);
     }
@@ -36,10 +40,10 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="mt-6 text-4xl font-bold text-gray-900">
-            Welcome Back
+            Register New Project
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account to continue
+            Fill in the details below to register your project
           </p>
         </div>
         <div className="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
@@ -60,34 +64,36 @@ export default function Login() {
             )}
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email address
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                  Project Title
                 </label>
                 <div className="mt-1">
                   <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
+                    id="title"
+                    name="title"
+                    type="text"
                     required
+                    value={formData.title}
+                    onChange={handleChange}
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="you@example.com"
+                    placeholder="Enter project title"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                  Project Description
                 </label>
                 <div className="mt-1">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
+                  <textarea
+                    id="description"
+                    name="description"
                     required
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="4"
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="••••••••"
+                    placeholder="Describe your project..."
                   />
                 </div>
               </div>
@@ -105,7 +111,7 @@ export default function Login() {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 ) : null}
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? 'Submitting...' : 'Submit Project'}
               </button>
             </div>
           </form>
